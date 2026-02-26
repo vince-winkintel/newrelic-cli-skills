@@ -1,6 +1,6 @@
 ---
 name: newrelic-cli-skills
-version: 1.0.0
+version: 1.0.1
 description: >
   Monitor, query, and manage New Relic observability data via the newrelic CLI.
   Covers NRQL queries, APM performance triage, deployment markers, alert management,
@@ -9,16 +9,23 @@ description: >
   or New Relic configuration.
 metadata:
   openclaw:
+    purpose: >
+      Read-mostly observability skill. Reads APM metrics, NRQL query results, alert
+      policies/conditions, and infrastructure host data from the New Relic API.
+      Write operations are limited to: creating deployment markers (apm sub-skill)
+      and muting/unmuting alert conditions (alerts sub-skill). No data is deleted.
+      Scripts execute newrelic CLI commands only; no shell eval or dynamic execution.
     requires:
       env:
         - NEW_RELIC_API_KEY
         - NEW_RELIC_ACCOUNT_ID
       binaries:
         - newrelic
-      notes: >
+      notes: |
         NEW_RELIC_API_KEY must be a User Key (starts with NRAK-).
         NEW_RELIC_ACCOUNT_ID is the numeric account ID from the NR UI.
-        Install CLI: curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
+        See README.md for CLI installation instructions.
+        Use an API key scoped to the minimum required accounts.
 tags:
   - newrelic
   - observability
