@@ -1,6 +1,6 @@
 ---
 name: newrelic-cli-skills
-version: 1.0.1
+version: 1.0.2
 description: >
   Monitor, query, and manage New Relic observability data via the newrelic CLI.
   Covers NRQL queries, APM performance triage, deployment markers, alert management,
