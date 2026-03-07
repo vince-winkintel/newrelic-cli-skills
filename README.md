@@ -20,7 +20,8 @@ An [OpenClaw](https://openclaw.ai) agent skill for monitoring, querying, and man
 ## Install CLI
 
 ```bash
-curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
+curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh -o install.sh
+bash install.sh && rm install.sh
 ```
 
 ## Setup
