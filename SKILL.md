@@ -52,7 +52,8 @@ tags:
 
 ```bash
 # Install
-curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh | bash
+curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh -o install.sh
+bash install.sh && rm install.sh
 
 # Configure profile
 newrelic profile add \
