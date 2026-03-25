@@ -33,7 +33,7 @@ nrql_escape_string() {
     char="${input:i:1}"
     case "$char" in
       "\\") output+="\\\\" ;;
-      "'") output+="\\'" ;;
+      "'") output+="''" ;;
       *) output+="$char" ;;
     esac
   done
