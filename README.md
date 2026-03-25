@@ -7,7 +7,7 @@ An [OpenClaw](https://openclaw.ai) agent skill for monitoring, querying, and man
 - **Performance triage** — identify slow transactions, DB bottlenecks, and error spikes
 - **NRQL queries** — run ad-hoc queries against your New Relic account from the terminal
 - **Deployment markers** — record releases so you can correlate deploys with performance changes
-- **Alert management** — create and manage alert policies, conditions, and channels
+- **Alert management** — create and manage alert policies, conditions, and channels, including condition deletion workflows
 - **Infrastructure monitoring** — host CPU, memory, disk, and process metrics
 - **Agent diagnostics** — validate agent config and connectivity
 
@@ -19,9 +19,24 @@ An [OpenClaw](https://openclaw.ai) agent skill for monitoring, querying, and man
 
 ## Install CLI
 
+Use a package manager or install the binary manually from the official New Relic CLI releases page.
+
+### Option 1: Homebrew (macOS)
+
 ```bash
-curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh -o install.sh
-bash install.sh && rm install.sh
+brew install newrelic-cli
+```
+
+### Option 2: Manual install from official releases
+
+1. Open https://github.com/newrelic/newrelic-cli/releases
+2. Download the archive for your OS/architecture
+3. Extract it
+4. Move the `newrelic` binary into a directory on your `PATH`
+5. Verify with:
+
+```bash
+newrelic --version
 ```
 
 ## Setup
