@@ -13,25 +13,61 @@ if [[ -z "${NEW_RELIC_API_KEY:-}" || -z "${NEW_RELIC_ACCOUNT_ID:-}" ]]; then
   exit 1
 fi
 
+require_positive_integer() {
+  local value="$1"
+  local name="$2"
+
+  if [[ ! "$value" =~ ^[1-9][0-9]*$ ]]; then
+    echo "ERROR: ${name} must be a positive integer" >&2
+    exit 1
+  fi
+}
+
+nrql_escape_string() {
+  local input="$1"
+  local output=""
+  local char
+  local i
+
+  for ((i = 0; i < ${#input}; i++)); do
+    char="${input:i:1}"
+    case "$char" in
+      "\\") output+="\\\\" ;;
+      "'") output+="''" ;;
+      *) output+="$char" ;;
+    esac
+  done
+
+  printf '%s' "$output"
+}
+
+require_positive_integer "$SINCE" "minutes-ago"
+SAFE_APP="$(nrql_escape_string "$APP")"
+
+run_nrql() {
+  local query="$1"
+  newrelic nrql query --accountId "$NEW_RELIC_ACCOUNT_ID" --query "$query"
+}
+
 echo "=== Error Report: $APP (last ${SINCE} minutes) ==="
 echo ""
 
 echo "--- Overall Error Rate ---"
-newrelic nrql query --accountId "$NEW_RELIC_ACCOUNT_ID" --query "
+run_nrql "
   SELECT count(*) AS 'Total Requests',
          filter(count(*), WHERE error IS true) AS 'Errors',
          percentage(count(*), WHERE error IS true) AS 'Error %'
   FROM Transaction
-  WHERE appName = '$APP'
+  WHERE appName = '$SAFE_APP'
   SINCE ${SINCE} minutes ago
 "
 
 echo ""
 echo "--- Errors by Transaction ---"
-newrelic nrql query --accountId "$NEW_RELIC_ACCOUNT_ID" --query "
+run_nrql "
   SELECT count(*) AS 'Count'
   FROM TransactionError
-  WHERE appName = '$APP'
+  WHERE appName = '$SAFE_APP'
   FACET transactionName
   SINCE ${SINCE} minutes ago
   LIMIT 10
@@ -40,10 +76,10 @@ newrelic nrql query --accountId "$NEW_RELIC_ACCOUNT_ID" --query "
 
 echo ""
 echo "--- Errors by Class/Type ---"
-newrelic nrql query --accountId "$NEW_RELIC_ACCOUNT_ID" --query "
+run_nrql "
   SELECT count(*) AS 'Count'
   FROM TransactionError
-  WHERE appName = '$APP'
+  WHERE appName = '$SAFE_APP'
   FACET error.class
   SINCE ${SINCE} minutes ago
   LIMIT 10
@@ -52,10 +88,10 @@ newrelic nrql query --accountId "$NEW_RELIC_ACCOUNT_ID" --query "
 
 echo ""
 echo "--- Recent Error Messages ---"
-newrelic nrql query --accountId "$NEW_RELIC_ACCOUNT_ID" --query "
+run_nrql "
   SELECT timestamp, transactionName, error.class, message
   FROM TransactionError
-  WHERE appName = '$APP'
+  WHERE appName = '$SAFE_APP'
   SINCE ${SINCE} minutes ago
   LIMIT 10
 "

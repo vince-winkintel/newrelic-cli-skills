@@ -3,18 +3,20 @@ name: newrelic-cli-skills
 version: 1.0.2
 description: >
   Monitor, query, and manage New Relic observability data via the newrelic CLI.
-  Covers NRQL queries, APM performance triage, deployment markers, alert management,
-  infrastructure monitoring, and agent diagnostics. Use when user asks about
-  application performance, error rates, slow transactions, deployment tracking,
-  or New Relic configuration.
+  Covers NRQL queries, APM performance triage, deployment markers, alert policy and
+  condition management, notification channel setup, infrastructure monitoring, and
+  agent diagnostics. Use when user asks about application performance, error rates,
+  slow transactions, deployment tracking, alert configuration, or New Relic setup.
 metadata:
   openclaw:
     purpose: >
-      Read-mostly observability skill. Reads APM metrics, NRQL query results, alert
-      policies/conditions, and infrastructure host data from the New Relic API.
-      Write operations are limited to: creating deployment markers (apm sub-skill)
-      and muting/unmuting alert conditions (alerts sub-skill). No data is deleted.
-      Scripts execute newrelic CLI commands only; no shell eval or dynamic execution.
+      New Relic observability skill for both read and targeted write workflows.
+      Reads APM metrics, NRQL query results, alert policies/conditions, incidents,
+      and infrastructure host data from the New Relic API. Write operations in this
+      repo include deployment marker creation plus alert policy, condition, and
+      notification channel creation; the alerts sub-skill also documents alert
+      condition deletion. Helper scripts execute newrelic CLI commands only and
+      should validate untrusted inputs before embedding them in NRQL.
     requires:
       env:
         - NEW_RELIC_API_KEY
@@ -51,9 +53,14 @@ tags:
 ## Setup & Auth
 
 ```bash
-# Install
-curl -Ls https://download.newrelic.com/install/newrelic-cli/scripts/install.sh -o install.sh
-bash install.sh && rm install.sh
+# Install (manual or package manager)
+# macOS (Homebrew)
+brew install newrelic-cli
+
+# Or manually download a release archive from:
+# https://github.com/newrelic/newrelic-cli/releases
+# Extract it, place the `newrelic` binary on your PATH, then verify with:
+newrelic --version
 
 # Configure profile
 newrelic profile add \
