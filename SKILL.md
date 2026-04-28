@@ -57,6 +57,10 @@ tags:
 # macOS (Homebrew)
 brew install newrelic-cli
 
+# Windows (Scoop)
+scoop bucket add newrelic-cli https://github.com/newrelic/newrelic-cli.git
+scoop install newrelic-cli
+
 # Or manually download a release archive from:
 # https://github.com/newrelic/newrelic-cli/releases
 # Extract it, place the `newrelic` binary on your PATH, then verify with:
