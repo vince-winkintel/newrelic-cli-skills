@@ -27,7 +27,14 @@ Use a package manager or install the binary manually from the official New Relic
 brew install newrelic-cli
 ```
 
-### Option 2: Manual install from official releases
+### Option 2: Scoop (Windows)
+
+```bash
+scoop bucket add newrelic-cli https://github.com/newrelic/newrelic-cli.git
+scoop install newrelic-cli
+```
+
+### Option 3: Manual install from official releases
 
 1. Open https://github.com/newrelic/newrelic-cli/releases
 2. Download the archive for your OS/architecture
