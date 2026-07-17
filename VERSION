@@ -1,8 +1,12 @@
-1.0.4
+1.0.5
 
 Release/version change metadata for this skill set lives here, not in individual skill files.
 
 Historical notes consolidated from skill docs:
+- newrelic-cli v0.113.0-v0.113.1
+  - Reviewed upstream compare `v0.112.18...v0.113.1` on 2026-07-17.
+  - Added `GOV` region support and the equivalent `FEDRAMP` alias to profile configuration guidance.
+  - Targeted `newrelic install --recipe ...` runs now exit non-zero when no requested recipe is installed; no existing install workflow in this skill set required changes.
 - newrelic-cli v0.112.1
   - Reviewed upstream compare `v0.112.0...v0.112.1` on 2026-04-28.
   - No user-facing CLI command, flag, auth/profile, or behavior changes were published in this release.

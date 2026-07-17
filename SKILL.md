@@ -1,6 +1,6 @@
 ---
 name: newrelic-cli-skills
-version: 1.0.4
+version: 1.0.5
 description: >
   Monitor, query, and manage New Relic observability data via the newrelic CLI.
   Covers NRQL queries, APM performance triage, deployment markers, alert policy and
@@ -71,7 +71,7 @@ newrelic profile add \
   --profile default \
   --apiKey $NEW_RELIC_API_KEY \
   --accountId $NEW_RELIC_ACCOUNT_ID \
-  --region US   # or EU
+  --region US   # US, EU, JP, GOV, or FEDRAMP
 
 newrelic profile default --profile default
 
@@ -126,7 +126,7 @@ newrelic entity search --name "" --type HOST
 |---|---|
 | `NEW_RELIC_API_KEY` | User key (NRAK-...) |
 | `NEW_RELIC_ACCOUNT_ID` | Numeric account ID |
-| `NEW_RELIC_REGION` | `US` or `EU` |
+| `NEW_RELIC_REGION` | `US`, `EU`, `JP`, `GOV`, or `FEDRAMP` (`FEDRAMP` is an alias for `GOV`) |
 
 ---
 
