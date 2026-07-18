@@ -106,5 +106,5 @@ newrelic profile add \
   --profile staging \
   --apiKey $NEW_RELIC_API_KEY \
   --accountId $NEW_RELIC_ACCOUNT_ID \
-  --region US  # US, EU, JP, GOV, or FEDRAMP
+  --region US  # US, EU, JP, GOV, or FEDRAMP (alias for GOV)
 ```

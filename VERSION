@@ -5,6 +5,8 @@ Release/version change metadata for this skill set lives here, not in individual
 Historical notes consolidated from skill docs:
 - newrelic-cli v0.113.0-v0.113.1
   - Reviewed upstream compare `v0.112.18...v0.113.1` on 2026-07-17.
+  - Reviewed `v0.112.2` through `v0.112.17`; these releases were documentation-neutral for this skill set.
+  - `v0.112.2` added the user-facing `NEW_RELIC_SKIP_AUTODISCOVERY` environment variable for targeted installs; no skill change was needed because this skill set does not document `newrelic install` recipe workflows.
   - Added `GOV` region support and the equivalent `FEDRAMP` alias to profile configuration guidance.
   - Targeted `newrelic install --recipe ...` runs now exit non-zero when no requested recipe is installed; no existing install workflow in this skill set required changes.
 - newrelic-cli v0.112.1
