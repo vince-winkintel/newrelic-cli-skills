@@ -53,7 +53,7 @@ newrelic profile add \
   --profile default \
   --apiKey $NEW_RELIC_API_KEY \
   --accountId $NEW_RELIC_ACCOUNT_ID \
-  --region US
+  --region US  # US, EU, JP, GOV, or FEDRAMP (alias for GOV)
 
 newrelic profile default --profile default
 ```
