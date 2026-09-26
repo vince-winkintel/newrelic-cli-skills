@@ -1,8 +1,12 @@
-1.0.5
+1.0.6
 
 Release/version change metadata for this skill set lives here, not in individual skill files.
 
 Historical notes consolidated from skill docs:
+- newrelic-cli v0.114.0
+  - Reviewed upstream compare `v0.113.19...v0.114.0` on 2026-09-26.
+  - Added current guidance for the new `usermanagement` and `accessmanagement` command trees, including read-before-write safeguards and post-write verification.
+  - Verified all related parent and leaf help surfaces using the official Darwin arm64 release binary after matching SHA-256 `ac066465cce2c4abe8ab1e3d22dd097d0f09ce629cb3c53b56ba77000c9797d9` from the published checksum manifest.
 - newrelic-cli v0.113.0-v0.113.1
   - Reviewed upstream compare `v0.112.18...v0.113.1` on 2026-07-17.
   - Reviewed `v0.112.2` through `v0.112.17`; these releases were documentation-neutral for this skill set.

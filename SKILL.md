@@ -1,12 +1,13 @@
 ---
 name: newrelic-cli-skills
-version: 1.0.5
+version: 1.0.6
 description: >
   Monitor, query, and manage New Relic observability data via the newrelic CLI.
   Covers NRQL queries, APM performance triage, deployment markers, alert policy and
-  condition management, notification channel setup, infrastructure monitoring, and
-  agent diagnostics. Use when user asks about application performance, error rates,
-  slow transactions, deployment tracking, alert configuration, or New Relic setup.
+  condition management, notification channel setup, infrastructure monitoring, agent
+  diagnostics, and identity/access administration. Use when user asks about application
+  performance, error rates, slow transactions, deployment tracking, alert configuration,
+  New Relic setup, users, groups, roles, permissions, or access grants.
 metadata:
   openclaw:
     purpose: >
@@ -15,8 +16,10 @@ metadata:
       and infrastructure host data from the New Relic API. Write operations in this
       repo include deployment marker creation plus alert policy, condition, and
       notification channel creation; the alerts sub-skill also documents alert
-      condition deletion. Helper scripts execute newrelic CLI commands only and
-      should validate untrusted inputs before embedding them in NRQL.
+      condition deletion. IAM workflows add user/group CRUD, membership changes, and
+      access-grant creation/revocation; require explicit confirmation before IAM writes
+      and verify each write by reading the target back. Helper scripts execute newrelic
+      CLI commands only and should validate untrusted inputs before embedding them in NRQL.
     requires:
       env:
         - NEW_RELIC_API_KEY
@@ -35,6 +38,7 @@ tags:
   - monitoring
   - performance
   - nrql
+  - iam
 ---
 
 # New Relic CLI Skills
@@ -47,6 +51,7 @@ tags:
 **Alert management?** → [`alerts/SKILL.md`](alerts/SKILL.md)
 **Infrastructure/host issues?** → [`infrastructure/SKILL.md`](infrastructure/SKILL.md)
 **Agent not reporting?** → [`diagnostics/SKILL.md`](diagnostics/SKILL.md)
+**Users, groups, roles, permissions, or access grants?** → [`iam/SKILL.md`](iam/SKILL.md)
 
 ---
 
@@ -140,6 +145,7 @@ newrelic entity search --name "" --type HOST
 | [`alerts/`](alerts/SKILL.md) | Alert policies, conditions, notification channels |
 | [`infrastructure/`](infrastructure/SKILL.md) | Host metrics, CPU/memory, process monitoring |
 | [`diagnostics/`](diagnostics/SKILL.md) | Agent health, config validation, connectivity |
+| [`iam/`](iam/SKILL.md) | Users, groups, memberships, roles, permissions, and access grants |
 
 ## Scripts
 
