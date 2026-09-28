@@ -10,6 +10,7 @@ An [OpenClaw](https://openclaw.ai) agent skill for monitoring, querying, and man
 - **Alert management** — create and manage alert policies, conditions, and channels, including condition deletion workflows
 - **Infrastructure monitoring** — host CPU, memory, disk, and process metrics
 - **Agent diagnostics** — validate agent config and connectivity
+- **Identity and access management** — inspect and administer authentication domains, users, groups, memberships, roles, permissions, and access grants
 
 ## Requirements
 
@@ -68,6 +69,7 @@ newrelic profile default --profile default
 | `alerts/` | Alert policies, conditions, channels |
 | `infrastructure/` | Host metrics — CPU, memory, disk, processes |
 | `diagnostics/` | Agent health, config validation, connectivity |
+| `iam/` | Identity and access administration — users, groups, roles, permissions, grants |
 
 ## Scripts
 
