@@ -31,6 +31,10 @@ metadata:
         NEW_RELIC_ACCOUNT_ID is the numeric account ID from the NR UI.
         See README.md for CLI installation instructions.
         Use an API key scoped to the minimum required accounts.
+        IAM writes also require organization-level authorization for the user associated
+        with the key: Authentication domain manager or Organization manager for
+        usermanagement, and Organization manager for accessmanagement grant writes.
+        Administrative user-management access requires a core or full platform user.
 tags:
   - newrelic
   - observability

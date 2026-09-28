@@ -8,14 +8,14 @@ Identity and access changes can remove access, grant elevated privileges, or del
 
 1. Default to read-only discovery.
 2. Resolve IDs from current CLI output; do not guess an authentication-domain, user, group, role, or account ID.
-3. Before a write, show the exact target, requested change, scope, and command, then require explicit confirmation.
-4. Treat user/group deletion, membership removal, grant creation, and grant revocation as high-impact writes.
+3. Treat every IAM write as confirmation-gated: show the exact target, requested change, scope, and command, then require explicit confirmation.
+4. Treat user/group deletion, membership removal, grant creation/revocation, user email changes, explicit user-tier selection or changes, and group creation/rename as identity-, access-, or billing-sensitive writes.
 5. Run the corresponding read command after every write and verify the intended state.
 6. Never print, log, or embed `NEW_RELIC_API_KEY` in a command.
 
 ## Prerequisites
 
-The API key must have the capabilities required for the requested operation. New Relic documents Organization manager access for administration; read-only discovery requires at least authentication-domain read capability.
+`NEW_RELIC_API_KEY` must be a User Key belonging to a core or full platform user with the organization-scoped role required for the operation. `usermanagement` writes require Authentication domain manager or Organization manager; prefer Authentication domain manager when it is sufficient. The upstream v0.114.0 command documentation requires Organization manager for `accessmanagement` grant writes. Read-only discovery requires at least Authentication domain read-only capability. These roles belong to the user associated with the key; account scoping alone does not authorize organization-level IAM administration.
 
 ```bash
 newrelic profile list
@@ -39,7 +39,7 @@ newrelic usermanagement auth-domains get --id "$AUTH_DOMAIN_ID"
 
 ### Users
 
-`--authDomainId` is required for user lookups. Optional filters are `--id`, `--email`, and `--name`.
+`--authDomainId` is required for user lookups. Optional filters are `--id`, `--email`, and `--name`. The email and name filters use equality matching, unlike the partial role-name match below; do not assume substring or case-insensitive matching.
 
 ```bash
 newrelic usermanagement users get --authDomainId "$AUTH_DOMAIN_ID"
@@ -53,7 +53,7 @@ newrelic usermanagement users get \
 
 ### Groups and membership
 
-`--authDomainId` is required for group lookups. Group results include their members.
+`--authDomainId` is required for group lookups. The name filter uses equality matching. Group results include members, but the nested member collection is not paginated by this CLI version.
 
 ```bash
 newrelic usermanagement groups get --authDomainId "$AUTH_DOMAIN_ID"
@@ -64,6 +64,8 @@ newrelic usermanagement groups get \
   --authDomainId "$AUTH_DOMAIN_ID" \
   --id "$GROUP_ID"
 ```
+
+If an equality-filtered user or group lookup is empty, retry unfiltered in the same authentication domain and inspect returned names and emails before creating anything. Do not conclude that the target is absent unless the full domain result set has been enumerated: v0.114.0 does not paginate the nested user/group collections. Use a fully paginated NerdGraph query or another authoritative complete listing when an unfiltered result may be truncated.
 
 ### Roles, permissions, and grants
 
@@ -85,11 +87,13 @@ newrelic accessmanagement grants get --groupId "$GROUP_ID"
 
 Role-name matching is partial. If multiple roles match, stop and select the exact role ID from the returned data before making a grant.
 
+In v0.114.0, `roles get` and `grants get` make one request only, even when filters are present. Before relying on either result, require `totalCount` to equal the number of returned `items`; a present, nonempty `nextCursor` also proves the result is incomplete. Do not conclude that a role or grant is absent from an incomplete result. Prefer `grants get --groupId "$GROUP_ID"` for group-specific decisions, but still apply this completeness check.
+
 ## User Administration
 
 ### Create
 
-`--authDomainId`, `--email`, and `--name` are required. Valid user tiers are `BASIC_USER_TIER`, `CORE_USER_TIER`, and `FULL_USER_TIER`.
+`--authDomainId`, `--email`, and `--name` are required. Valid user tiers are `BASIC_USER_TIER`, `CORE_USER_TIER`, and `FULL_USER_TIER`. Under New Relic's current user-based pricing policy, core and full platform users are billable user types while basic users are not; actual charges depend on the organization's agreement. State the requested tier and this billing impact before confirmation.
 
 ```bash
 newrelic usermanagement users create \
@@ -109,7 +113,7 @@ newrelic usermanagement users get \
 
 ### Update
 
-`--id` is required. Pass only the fields the user intends to change: `--email`, `--name`, `--userType`, or `--timeZone`.
+`--id` is required. Pass only the fields the user intends to change: `--email`, `--name`, `--userType`, or `--timeZone`. Before changing `--email`, confirm the resolved user ID and the old and new addresses. Before changing `--userType`, state the current and requested tiers and the billing impact described above.
 
 ```bash
 newrelic usermanagement users update \
@@ -133,6 +137,8 @@ Verify that `users get --authDomainId ... --id ...` no longer returns the user.
 
 ### Create or rename
 
+Confirm the authentication-domain ID and exact requested name before creating a group. Before renaming, also confirm the resolved group ID and current name.
+
 ```bash
 newrelic usermanagement groups create \
   --authDomainId "$AUTH_DOMAIN_ID" \
@@ -145,19 +151,35 @@ newrelic usermanagement groups update \
 
 Read the group back by ID after either command.
 
-### Add or remove a member
+### Add a member
 
 ```bash
 newrelic usermanagement groups members add \
   --groupId "$GROUP_ID" \
   --userId "$USER_ID"
+```
+
+After the add, read the user and inspect `groups.groups`. Presence of `$GROUP_ID` confirms the membership:
+
+```bash
+newrelic usermanagement users get \
+  --authDomainId "$AUTH_DOMAIN_ID" \
+  --id "$USER_ID"
+```
+
+### Remove a member
+
+Before removal, inspect the group's complete grant set, summarize the access the user will lose, and obtain explicit confirmation. Apply the grant-result completeness check above before relying on this output.
+
+```bash
+newrelic accessmanagement grants get --groupId "$GROUP_ID"
 
 newrelic usermanagement groups members remove \
   --groupId "$GROUP_ID" \
   --userId "$USER_ID"
 ```
 
-After either change, query the group by ID and confirm the membership list. Before removal, also inspect the group's grants because the user will lose access inherited through that group.
+After removal, read the user by ID and inspect `groups.groups`. The target group's presence proves removal failed, but absence does not conclusively prove removal: both the group's `users` and user's `groups` relationships are cursor-based, while v0.114.0 returns only their first page and exposes no nested cursor. If absence must be proven, use a fully paginated NerdGraph query; otherwise report that the mutation succeeded but absence could not be conclusively verified.
 
 ### Delete
 
@@ -181,12 +203,14 @@ A grant assigns a role to a group at either account or organization scope. Inspe
 
 ### Account-scoped grant
 
+Resolve the requested account ID and obtain explicit confirmation before setting `TARGET_ACCOUNT_ID`; do not infer the IAM target from the profile or ambient `NEW_RELIC_ACCOUNT_ID`.
+
 ```bash
 newrelic accessmanagement grants create \
   --groupId "$GROUP_ID" \
   --roleId "$ROLE_ID" \
   --scope account \
-  --accountId "$NEW_RELIC_ACCOUNT_ID"
+  --accountId "$TARGET_ACCOUNT_ID"
 ```
 
 ### Organization-scoped grant
@@ -200,7 +224,9 @@ newrelic accessmanagement grants create \
 
 ### Revoke a grant
 
-Use the same group, role, scope, and account ID as the existing grant.
+Select the exact grant item from a complete `grants get --groupId "$GROUP_ID"` result. Map `.group.id` to `--groupId` and `.role.id` to `--roleId`. Translate `.scope.type` from API value `ACCOUNT` or `ORGANIZATION` to CLI value `account` or `organization`. For `ACCOUNT`, map `.scope.id` to a separately confirmed `TARGET_ACCOUNT_ID`; omit `--accountId` for `ORGANIZATION`. Stop for `GROUP`, `OTHER`, or any unsupported scope.
+
+Inspect `.dataAccessPolicy.id`, not merely whether `dataAccessPolicy` is non-null. If the ID is nonempty, stop: v0.114.0 exposes no revoke flag for the policy ID and cannot reliably construct the full account-revoke input.
 
 ```bash
 # Account scope
@@ -208,7 +234,7 @@ newrelic accessmanagement grants revoke \
   --groupId "$GROUP_ID" \
   --roleId "$ROLE_ID" \
   --scope account \
-  --accountId "$NEW_RELIC_ACCOUNT_ID"
+  --accountId "$TARGET_ACCOUNT_ID"
 
 # Organization scope
 newrelic accessmanagement grants revoke \
