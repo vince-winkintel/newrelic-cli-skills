@@ -1,6 +1,6 @@
 ---
 name: newrelic-cli-skills
-version: 1.0.6
+version: 1.0.7
 description: >
   Monitor, query, and manage New Relic observability data via the newrelic CLI.
   Covers NRQL queries, APM performance triage, deployment markers, alert policy and
@@ -85,8 +85,12 @@ newrelic profile add \
 newrelic profile default --profile default
 
 # Verify
-newrelic profile list
+newrelic profile list --format JSON
 ```
+
+For structured profile discovery, pass `--format JSON` explicitly. The `isDefault`
+field identifies the persisted default profile, and profile names are emitted without
+terminal decoration.
 
 ---
 

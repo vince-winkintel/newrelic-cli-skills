@@ -98,13 +98,19 @@ newrelic entity search --name "my-host" --type HOST | \
 # List all profiles
 newrelic profile list
 
-# Switch profile
-newrelic profile default --profile production
+# Machine-readable profile inventory; inspect isDefault rather than parsing table text
+newrelic profile list --format JSON
+
+# Switch profile; pass the exact profile name explicitly
+newrelic profile default --profile production.us
 
 # Add a new profile
 newrelic profile add \
-  --profile staging \
+  --profile staging.us \
   --apiKey $NEW_RELIC_API_KEY \
   --accountId $NEW_RELIC_ACCOUNT_ID \
   --region US  # US, EU, JP, GOV, or FEDRAMP (alias for GOV)
 ```
+
+Profile names may contain dots and other punctuation. Preserve the exact identifier
+for `add`, `default`, and `delete`; confirm the target before deleting a profile.

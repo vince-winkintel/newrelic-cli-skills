@@ -1,8 +1,13 @@
-1.0.6
+1.0.7
 
 Release/version change metadata for this skill set lives here, not in individual skill files.
 
 Historical notes consolidated from skill docs:
+- newrelic-cli v0.114.1-v0.114.3
+  - Reviewed upstream compare `v0.114.0...v0.114.3` on 2026-10-01; `v0.114.1` and `v0.114.2` contained no published user-facing changes relevant to this skill set.
+  - Updated profile guidance for exact dotted/special-character identifiers and explicit structured `profile list` output. JSON and YAML profile listings now honor `--format`, avoid ANSI decoration, and expose the persisted default as `isDefault`.
+  - `profile default` and `profile delete` now reject a missing `--profile`; non-interactive profile creation leaves an unresolved account ID unset and warns when `--acceptDefaults` cannot select one automatically.
+  - Verified `profile`, `profile add`, `profile list`, `profile default`, and `profile delete` help plus dotted-name JSON listing using the official Darwin arm64 release binary after matching SHA-256 `4f9af03d32e21876745cb5094aa52c8893d6832d83016417b04d38d86396a9d3` from the published checksum manifest.
 - newrelic-cli v0.114.0
   - Reviewed upstream compare `v0.113.19...v0.114.0` on 2026-09-26.
   - Reviewed upstream releases `v0.113.2` through `v0.113.19`; these releases were documentation-neutral for this skill set. The range fixed Fleet Control fleet-search pagination and client trace-log redaction, and otherwise contained dependency/toolchain security, packaging, and release-pipeline maintenance. This repo does not document Fleet Control, and no documented command or flag contract changed.
