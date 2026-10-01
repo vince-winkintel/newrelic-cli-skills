@@ -1,6 +1,6 @@
 ---
 name: newrelic-cli-skills
-version: 1.0.6
+version: 1.0.7
 description: >
   Monitor, query, and manage New Relic observability data via the newrelic CLI.
   Covers NRQL queries, APM performance triage, deployment markers, alert policy and
@@ -77,16 +77,23 @@ newrelic --version
 
 # Configure profile
 newrelic profile add \
-  --profile default \
+  --profile "default" \
   --apiKey $NEW_RELIC_API_KEY \
   --accountId $NEW_RELIC_ACCOUNT_ID \
   --region US   # US, EU, JP, GOV, or FEDRAMP (alias for GOV)
 
-newrelic profile default --profile default
+newrelic profile default --profile "default"
 
 # Verify
-newrelic profile list
+newrelic profile list --format JSON
 ```
+
+For structured profile discovery, pass `--format JSON` explicitly. The `isDefault`
+field identifies the persisted default profile, and profile names are emitted without
+terminal decoration. It does not necessarily identify the effective credentials: the
+global `--profile` flag can select another profile, while `NEW_RELIC_API_KEY`,
+`NEW_RELIC_ACCOUNT_ID`, `NEW_RELIC_REGION`, and `NEW_RELIC_LICENSE_KEY` override the
+corresponding stored profile fields.
 
 ---
 
