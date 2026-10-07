@@ -10,6 +10,25 @@ REVISION="${2:?revision required (e.g. git SHA, semver, MR number)}"
 DESCRIPTION="${3:-Automated deployment}"
 USER="${4:-deploy-bot}"
 
+if [[ ! "$APP_ID" =~ ^[0-9]+$ ]]; then
+  echo "ERROR: app_id must contain decimal digits only" >&2
+  exit 2
+fi
+
+reject_control_characters() {
+  local label=$1
+  local value=$2
+
+  if [[ "$value" =~ [[:cntrl:]] ]]; then
+    echo "ERROR: $label must not contain control characters" >&2
+    exit 2
+  fi
+}
+
+reject_control_characters "revision" "$REVISION"
+reject_control_characters "description" "$DESCRIPTION"
+reject_control_characters "user" "$USER"
+
 if [[ -z "${NEW_RELIC_API_KEY:-}" ]]; then
   echo "ERROR: NEW_RELIC_API_KEY must be set"
   exit 1

@@ -21,7 +21,7 @@ newrelic apm deployment create \
 ### Optional
 - `--description` — what changed (show in NR UI on charts)
 - `--user` — who/what deployed
-- `--changelog` — detailed change notes
+- `--change-log` — detailed change notes
 
 ---
 
@@ -44,22 +44,17 @@ newrelic apm deployment list --applicationId <APP_ID>
 
 ## GitLab/GitHub CI Integration
 
-Add to your CI pipeline after a successful deploy:
+Check out this skill repository in the CI job, set `NEW_RELIC_API_KEY` as a masked secret, and invoke the maintained helper after a successful deploy. Keep every CI-provided value in its own quoted argument:
 
 ```bash
-#!/bin/bash
-# deploy-marker.sh
-APP_ID="${NEW_RELIC_APP_ID}"
-REVISION="${CI_COMMIT_SHORT_SHA:-$(git rev-parse --short HEAD)}"
-DESCRIPTION="${CI_COMMIT_TITLE:-Deployment}"
-USER="${GITLAB_USER_LOGIN:-ci-bot}"
-
-newrelic apm deployment create \
-  --applicationId "$APP_ID" \
-  --revision "$REVISION" \
-  --description "$DESCRIPTION" \
-  --user "$USER"
+./scripts/deployment-marker.sh \
+  "$NEW_RELIC_APP_ID" \
+  "${CI_COMMIT_SHORT_SHA:-${GITHUB_SHA:-unknown-revision}}" \
+  "${CI_COMMIT_TITLE:-${GITHUB_COMMIT_MESSAGE:-Deployment}}" \
+  "${GITLAB_USER_LOGIN:-${GITHUB_ACTOR:-ci-bot}}"
 ```
+
+The helper requires a decimal application ID, rejects control characters in all text fields, and forwards each accepted value as a literal argument. Do not generate a script from CI variables and do not pass these values through `eval` or `source`.
 
 ---
 
@@ -83,22 +78,12 @@ SINCE 1 week ago
 
 ## Automation: Mark on Every Merge
 
-Script to call from a post-merge webhook or CI step:
+Call the repository helper from a post-merge webhook or CI step rather than copying its implementation into generated source:
 
 ```bash
-#!/bin/bash
-# Usage: ./deployment-marker.sh <app_id> <revision> <description>
-set -euo pipefail
-
-APP_ID="${1:?app_id required}"
-REVISION="${2:?revision required}"
-DESCRIPTION="${3:-Automated deployment}"
-
-newrelic apm deployment create \
-  --applicationId "$APP_ID" \
-  --revision "$REVISION" \
-  --description "$DESCRIPTION" \
-  --user "steven-openclaw"
-
-echo "Deployment marker recorded: $REVISION → app $APP_ID"
+./scripts/deployment-marker.sh \
+  "$NEW_RELIC_APP_ID" \
+  "$RELEASE_REVISION" \
+  "$RELEASE_DESCRIPTION" \
+  "$DEPLOY_USER"
 ```
