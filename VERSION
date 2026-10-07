@@ -1,8 +1,14 @@
-1.0.7
+1.0.8
 
 Release/version change metadata for this skill set lives here, not in individual skill files.
 
 Historical notes consolidated from skill docs:
+- newrelic-cli v0.114.4-v0.115.0
+  - Reviewed upstream compare `v0.114.3...v0.115.0` on 2026-10-07; `v0.114.4` and `v0.114.5` contained no published user-facing changes relevant to this skill set.
+  - Added current guidance for the new `aimonitoring application search` and `aimonitoring events` command trees introduced in v0.115.0, including event aliases, application-search limits, instrumentation-specific fields, NRQL-fragment handling, and sensitive prompt/response data safeguards.
+  - Evaluated the v0.114.6 Fleet Control changes: configuration creation now defaults to `AgentConfig`, supports the `--legacy-config` escape hatch, and configuration retrieval supports `--show-metadata`. This repository does not currently document Fleet Control workflows, so no skill surface was changed for those commands.
+  - Removed release-number qualifiers from IAM operational guidance after confirming that its command implementations were unchanged through v0.115.0; release history remains in this file only.
+  - Verified root, `aimonitoring`, `aimonitoring application`, `aimonitoring application search`, `aimonitoring events`, and affected Fleet Control help using the official Darwin arm64 v0.115.0 binary after matching SHA-256 `b5ece38f036a85bd672bfca2755b4dc4eded489d46147d5abacff28d4bdfd401` from the published checksum manifest.
 - newrelic-cli v0.114.1-v0.114.3
   - Reviewed upstream compare `v0.114.0...v0.114.3` on 2026-10-01; `v0.114.1` and `v0.114.2` contained no published user-facing changes relevant to this skill set.
   - Updated profile guidance for exact dotted/special-character identifiers and explicit structured `profile list` output. JSON and YAML profile listings now honor `--format`, avoid ANSI decoration, and expose the persisted default as `isDefault`.
