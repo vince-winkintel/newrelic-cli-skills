@@ -1,25 +1,27 @@
 ---
 name: newrelic-cli-skills
-version: 1.0.7
+version: 1.0.8
 description: >
   Monitor, query, and manage New Relic observability data via the newrelic CLI.
-  Covers NRQL queries, APM performance triage, deployment markers, alert policy and
-  condition management, notification channel setup, infrastructure monitoring, agent
-  diagnostics, and identity/access administration. Use when user asks about application
+  Covers NRQL queries, AI Monitoring telemetry, APM performance triage, deployment
+  markers, alert policy and condition management, notification channel setup,
+  infrastructure monitoring, agent diagnostics, and identity/access administration.
+  Use when user asks about LLM token usage or AI application telemetry, application
   performance, error rates, slow transactions, deployment tracking, alert configuration,
   New Relic setup, users, groups, roles, permissions, or access grants.
 metadata:
   openclaw:
     purpose: >
       New Relic observability skill for both read and targeted write workflows.
-      Reads APM metrics, NRQL query results, alert policies/conditions, incidents,
-      and infrastructure host data from the New Relic API. Write operations in this
-      repo include deployment marker creation plus alert policy, condition, and
-      notification channel creation; the alerts sub-skill also documents alert
-      condition deletion. IAM workflows add user/group CRUD, membership changes, and
-      access-grant creation/revocation; require explicit confirmation before IAM writes
-      and verify each write by reading the target back. Helper scripts execute newrelic
-      CLI commands only and should validate untrusted inputs before embedding them in NRQL.
+      Reads APM metrics, NRQL query results, AI Monitoring events (including potentially
+      sensitive prompt/response content and tool inputs), alert policies/conditions,
+      incidents, and infrastructure host data from the New Relic API. Write operations
+      in this repo include deployment marker creation plus alert policy, condition, and
+      notification channel creation; the alerts sub-skill also documents alert condition
+      deletion. IAM workflows add user/group CRUD, membership changes, and access-grant
+      creation/revocation; require explicit confirmation before IAM writes and verify each
+      write by reading the target back. Helper scripts execute newrelic CLI commands only
+      and should validate untrusted inputs before embedding them in NRQL.
     requires:
       env:
         - NEW_RELIC_API_KEY
@@ -42,6 +44,7 @@ tags:
   - monitoring
   - performance
   - nrql
+  - ai-monitoring
   - iam
 ---
 
@@ -51,6 +54,7 @@ tags:
 
 **Performance issue reported?** → [`apm/SKILL.md`](apm/SKILL.md)
 **Need to query data with NRQL?** → [`nrql/SKILL.md`](nrql/SKILL.md)
+**AI/LLM application, token, error, prompt, or response telemetry?** → [`aimonitoring/SKILL.md`](aimonitoring/SKILL.md)
 **Recording a deployment?** → [`deployments/SKILL.md`](deployments/SKILL.md)
 **Alert management?** → [`alerts/SKILL.md`](alerts/SKILL.md)
 **Infrastructure/host issues?** → [`infrastructure/SKILL.md`](infrastructure/SKILL.md)
@@ -115,6 +119,9 @@ newrelic apm deployment create \
 
 # Run diagnostics
 newrelic diagnose run
+
+# Find applications reporting AI Monitoring telemetry
+newrelic aimonitoring application search
 ```
 
 ---
@@ -152,6 +159,7 @@ newrelic entity search --name "" --type HOST
 |---|---|
 | [`apm/`](apm/SKILL.md) | Performance triage, slow transactions, error analysis |
 | [`nrql/`](nrql/SKILL.md) | Custom queries, dashboards, ad-hoc data exploration |
+| [`aimonitoring/`](aimonitoring/SKILL.md) | AI/LLM applications, token usage, errors, prompts, responses, and telemetry |
 | [`deployments/`](deployments/SKILL.md) | Mark releases, correlate deploys with performance |
 | [`alerts/`](alerts/SKILL.md) | Alert policies, conditions, notification channels |
 | [`infrastructure/`](infrastructure/SKILL.md) | Host metrics, CPU/memory, process monitoring |

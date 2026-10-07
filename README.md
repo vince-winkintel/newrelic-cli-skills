@@ -6,6 +6,7 @@ An [OpenClaw](https://openclaw.ai) agent skill for monitoring, querying, and man
 
 - **Performance triage** — identify slow transactions, DB bottlenecks, and error spikes
 - **NRQL queries** — run ad-hoc queries against your New Relic account from the terminal
+- **AI Monitoring** — find AI-enabled applications and inspect LLM token, error, tool, embedding, and message telemetry
 - **Deployment markers** — record releases so you can correlate deploys with performance changes
 - **Alert management** — create and manage alert policies, conditions, and channels, including condition deletion workflows
 - **Infrastructure monitoring** — host CPU, memory, disk, and process metrics
@@ -65,6 +66,7 @@ newrelic profile default --profile default
 |---|---|
 | `apm/` | Performance triage — slow transactions, DB analysis, error rates |
 | `nrql/` | NRQL query patterns and ad-hoc data exploration |
+| `aimonitoring/` | AI/LLM application discovery, token usage, errors, prompts, responses, and telemetry |
 | `deployments/` | Deployment markers and release tracking |
 | `alerts/` | Alert policies, conditions, channels |
 | `infrastructure/` | Host metrics — CPU, memory, disk, processes |

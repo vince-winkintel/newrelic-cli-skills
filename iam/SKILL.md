@@ -2,6 +2,9 @@
 
 Use the `usermanagement` command tree for authentication domains, users, groups, and memberships. Use `accessmanagement` for roles, permissions, and group access grants.
 
+Behavioral and completeness caveats in this guide are verified against the upstream CLI
+release recorded in [`../VERSION`](../VERSION). Revalidate them whenever that file advances.
+
 ## Safety Contract
 
 Identity and access changes can remove access, grant elevated privileges, or delete identities.
@@ -15,7 +18,7 @@ Identity and access changes can remove access, grant elevated privileges, or del
 
 ## Prerequisites
 
-`NEW_RELIC_API_KEY` must be a User Key belonging to a core or full platform user with the organization-scoped role required for the operation. `usermanagement` writes require Authentication domain manager or Organization manager; prefer Authentication domain manager when it is sufficient. The upstream v0.114.0 command documentation requires Organization manager for `accessmanagement` grant writes. Read-only discovery requires at least Authentication domain read-only capability. These roles belong to the user associated with the key; account scoping alone does not authorize organization-level IAM administration.
+`NEW_RELIC_API_KEY` must be a User Key belonging to a core or full platform user with the organization-scoped role required for the operation. `usermanagement` writes require Authentication domain manager or Organization manager; prefer Authentication domain manager when it is sufficient. The command documentation for the recorded release requires Organization manager for `accessmanagement` grant writes. Read-only discovery requires at least Authentication domain read-only capability. These roles belong to the user associated with the key; account scoping alone does not authorize organization-level IAM administration.
 
 ```bash
 newrelic profile list
@@ -65,7 +68,7 @@ newrelic usermanagement groups get \
   --id "$GROUP_ID"
 ```
 
-If an equality-filtered user or group lookup is empty, retry unfiltered in the same authentication domain and inspect returned names and emails before creating anything. Do not conclude that the target is absent unless the full domain result set has been enumerated: v0.114.0 does not paginate the nested user/group collections. Use a fully paginated NerdGraph query or another authoritative complete listing when an unfiltered result may be truncated.
+If an equality-filtered user or group lookup is empty, retry unfiltered in the same authentication domain and inspect returned names and emails before creating anything. Do not conclude that the target is absent unless the full domain result set has been enumerated: the recorded release does not paginate the nested user/group collections. Use a fully paginated NerdGraph query or another authoritative complete listing when an unfiltered result may be truncated.
 
 ### Roles, permissions, and grants
 
@@ -87,7 +90,7 @@ newrelic accessmanagement grants get --groupId "$GROUP_ID"
 
 Role-name matching is partial. If multiple roles match, stop and select the exact role ID from the returned data before making a grant.
 
-In v0.114.0, `roles get` and `grants get` make one request only, even when filters are present. Before relying on either result, require `totalCount` to equal the number of returned `items`; a present, nonempty `nextCursor` also proves the result is incomplete. Do not conclude that a role or grant is absent from an incomplete result. Prefer `grants get --groupId "$GROUP_ID"` for group-specific decisions, but still apply this completeness check.
+`roles get` and `grants get` make one request only, even when filters are present. Before relying on either result, require `totalCount` to equal the number of returned `items`; a present, nonempty `nextCursor` also proves the result is incomplete. Do not conclude that a role or grant is absent from an incomplete result. Prefer `grants get --groupId "$GROUP_ID"` for group-specific decisions, but still apply this completeness check.
 
 ## User Administration
 
@@ -179,7 +182,7 @@ newrelic usermanagement groups members remove \
   --userId "$USER_ID"
 ```
 
-After removal, read the user by ID and inspect `groups.groups`. The target group's presence proves removal failed, but absence does not conclusively prove removal: both the group's `users` and user's `groups` relationships are cursor-based, while v0.114.0 returns only their first page and exposes no nested cursor. If absence must be proven, use a fully paginated NerdGraph query; otherwise report that the mutation succeeded but absence could not be conclusively verified.
+After removal, read the user by ID and inspect `groups.groups`. The target group's presence proves removal failed, but absence does not conclusively prove removal: both the group's `users` and user's `groups` relationships are cursor-based, while the recorded release returns only their first page and exposes no nested cursor. If absence must be proven, use a fully paginated NerdGraph query; otherwise report that the mutation succeeded but absence could not be conclusively verified.
 
 ### Delete
 
@@ -226,7 +229,7 @@ newrelic accessmanagement grants create \
 
 Select the exact grant item from a complete `grants get --groupId "$GROUP_ID"` result. Map `.group.id` to `--groupId` and `.role.id` to `--roleId`. Translate `.scope.type` from API value `ACCOUNT` or `ORGANIZATION` to CLI value `account` or `organization`. For `ACCOUNT`, map `.scope.id` to a separately confirmed `TARGET_ACCOUNT_ID`; omit `--accountId` for `ORGANIZATION`. Stop for `GROUP`, `OTHER`, or any unsupported scope.
 
-Inspect `.dataAccessPolicy.id`, not merely whether `dataAccessPolicy` is non-null. If the ID is nonempty, stop: v0.114.0 exposes no revoke flag for the policy ID and cannot reliably construct the full account-revoke input.
+Inspect `.dataAccessPolicy.id`, not merely whether `dataAccessPolicy` is non-null. If the ID is nonempty, stop: the recorded release exposes no revoke flag for the policy ID and cannot reliably construct the full account-revoke input.
 
 ```bash
 # Account scope
