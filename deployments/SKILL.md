@@ -44,17 +44,27 @@ newrelic apm deployment list --applicationId <APP_ID>
 
 ## GitLab/GitHub CI Integration
 
-Check out this skill repository in the CI job, set `NEW_RELIC_API_KEY` as a masked secret, and invoke the maintained helper after a successful deploy. Keep every CI-provided value in its own quoted argument:
+Check out this skill repository into `vendor/newrelic-cli-skills` in the application CI
+job, set `NEW_RELIC_API_KEY` as a masked secret, and invoke the maintained helper after a
+successful deploy. In GitHub Actions, use a second `actions/checkout` step with
+`repository: vince-winkintel/newrelic-cli-skills` and `path: vendor/newrelic-cli-skills`;
+in GitLab, clone or add the repository as a submodule at the same path. Keep every
+CI-provided value in its own quoted argument:
 
 ```bash
-./scripts/deployment-marker.sh \
+NEWRELIC_SKILLS_DIR=vendor/newrelic-cli-skills
+
+"$NEWRELIC_SKILLS_DIR/scripts/deployment-marker.sh" \
   "$NEW_RELIC_APP_ID" \
-  "${CI_COMMIT_SHORT_SHA:-${GITHUB_SHA:-unknown-revision}}" \
-  "${CI_COMMIT_TITLE:-${GITHUB_COMMIT_MESSAGE:-Deployment}}" \
+  "${CI_COMMIT_SHORT_SHA:-$(git rev-parse --short=8 HEAD)}" \
+  "${CI_COMMIT_TITLE:-$(git log -1 --format=%s)}" \
   "${GITLAB_USER_LOGIN:-${GITHUB_ACTOR:-ci-bot}}"
 ```
 
-The helper requires a decimal application ID, rejects control characters in all text fields, and forwards each accepted value as a literal argument. Do not generate a script from CI variables and do not pass these values through `eval` or `source`.
+The helper requires a decimal application ID, converts tabs and line breaks in text fields
+to spaces, rejects any remaining control characters, and forwards each accepted value as
+a literal argument. Do not generate a script from CI variables and do not pass these
+values through `eval` or `source`.
 
 ---
 
@@ -78,10 +88,12 @@ SINCE 1 week ago
 
 ## Automation: Mark on Every Merge
 
-Call the repository helper from a post-merge webhook or CI step rather than copying its implementation into generated source:
+Call the repository helper from a post-merge webhook or CI step rather than copying its
+implementation into generated source. Set `NEWRELIC_SKILLS_DIR` to the explicit checkout
+location shown above; multi-line release descriptions are normalized to one line:
 
 ```bash
-./scripts/deployment-marker.sh \
+"$NEWRELIC_SKILLS_DIR/scripts/deployment-marker.sh" \
   "$NEW_RELIC_APP_ID" \
   "$RELEASE_REVISION" \
   "$RELEASE_DESCRIPTION" \

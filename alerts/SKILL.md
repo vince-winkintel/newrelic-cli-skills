@@ -6,7 +6,7 @@ The CLI has no alert-management command tree. Configure policies, conditions, an
 
 ---
 
-## View Open Incidents
+## View Recently Opened Incident Events
 
 Query incident events through the supported `nrql query` command:
 
@@ -20,7 +20,10 @@ newrelic nrql query --accountId "$NEW_RELIC_ACCOUNT_ID" --query "
 "
 ```
 
-This is read-only. Incident event availability and attributes depend on the data retained in the selected account.
+This is read-only and reports `open` events recorded in the last 24 hours, not the current
+state of every incident. It can include an incident that later closed and omit an older
+incident that remains open. Incident event availability and attributes depend on the data
+retained in the selected account.
 
 ## Review Recent Incident Activity
 

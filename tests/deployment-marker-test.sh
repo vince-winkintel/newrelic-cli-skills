@@ -6,7 +6,15 @@ SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 REPO_ROOT=$(CDPATH= cd -- "$SCRIPT_DIR/.." && pwd)
 HELPER="$REPO_ROOT/scripts/deployment-marker.sh"
 TEST_TMP=$(mktemp -d "${TMPDIR:-/tmp}/deployment-marker-test.XXXXXX")
-trap 'rm -rf "$TEST_TMP"' EXIT HUP INT TERM
+
+cleanup() {
+  rm -rf "$TEST_TMP"
+}
+
+trap cleanup EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 FAKE_BIN="$TEST_TMP/bin"
 INVOCATION_FILE="$TEST_TMP/invoked"
@@ -66,28 +74,66 @@ assert_rejected() {
   pass "$name"
 }
 
-NEWLINE_VALUE=$(printf 'rev\ninjected')
-TAB_VALUE=$(printf 'description	injected')
-RETURN_VALUE=$(printf 'userinjected')
+assert_forwarded() {
+  name=$1
+  app_id=$2
+  revision=$3
+  description=$4
+  user=$5
+  expected_revision=$6
+  expected_description=$7
+  expected_user=$8
+
+  export EXPECTED_APP_ID=$app_id
+  export EXPECTED_REVISION=$expected_revision
+  export EXPECTED_DESCRIPTION=$expected_description
+  export EXPECTED_USER=$expected_user
+  rm -f "$INVOCATION_FILE"
+
+  PATH="$FAKE_BIN:$PATH" NEW_RELIC_API_KEY=test-key \
+    "$HELPER" "$app_id" "$revision" "$description" "$user" \
+    >"$TEST_TMP/output" 2>&1 || fail "$name: helper failed"
+
+  [ -e "$INVOCATION_FILE" ] || fail "$name: newrelic was not invoked"
+  pass "$name"
+}
+
+BELL_VALUE=$(printf 'rev\007injected')
+ESC_VALUE=$(printf 'description\033injected')
+DEL_VALUE=$(printf 'user\177injected')
 
 assert_rejected "rejects a nonnumeric application ID" "12x34" "rev" "description" "user"
-assert_rejected "rejects control characters in revision" "1234" "$NEWLINE_VALUE" "description" "user"
-assert_rejected "rejects control characters in description" "1234" "rev" "$TAB_VALUE" "user"
-assert_rejected "rejects control characters in user" "1234" "rev" "description" "$RETURN_VALUE"
+assert_rejected "rejects non-whitespace controls in revision" "1234" "$BELL_VALUE" "description" "user"
+assert_rejected "rejects non-whitespace controls in description" "1234" "rev" "$ESC_VALUE" "user"
+assert_rejected "rejects non-whitespace controls in user" "1234" "rev" "description" "$DEL_VALUE"
+
+MULTILINE_REVISION=$(printf 'rev\ninjected')
+TABBED_DESCRIPTION=$(printf 'description\tinjected')
+RETURNED_USER=$(printf 'user\rinjected')
+assert_forwarded \
+  "normalizes tabs and line breaks" \
+  "1234" \
+  "$MULTILINE_REVISION" \
+  "$TABBED_DESCRIPTION" \
+  "$RETURNED_USER" \
+  "rev injected" \
+  "description injected" \
+  "user injected"
 
 SENTINEL="$TEST_TMP/metacharacters-executed"
 export SENTINEL
 REVISION='rev; touch "$SENTINEL"'
 DESCRIPTION='$(touch "$SENTINEL") `touch "$SENTINEL"`'
 USER='deploy-bot && touch "$SENTINEL"'
-export EXPECTED_APP_ID=1234 EXPECTED_REVISION="$REVISION"
-export EXPECTED_DESCRIPTION="$DESCRIPTION" EXPECTED_USER="$USER"
-rm -f "$INVOCATION_FILE" "$SENTINEL"
+rm -f "$SENTINEL"
+assert_forwarded \
+  "forwards shell metacharacters as literal argv" \
+  "1234" \
+  "$REVISION" \
+  "$DESCRIPTION" \
+  "$USER" \
+  "$REVISION" \
+  "$DESCRIPTION" \
+  "$USER"
 
-PATH="$FAKE_BIN:$PATH" NEW_RELIC_API_KEY=test-key \
-  "$HELPER" "$EXPECTED_APP_ID" "$REVISION" "$DESCRIPTION" "$USER" \
-  >"$TEST_TMP/output" 2>&1 || fail "literal metacharacter forwarding: helper failed"
-
-[ -e "$INVOCATION_FILE" ] || fail "literal metacharacter forwarding: newrelic was not invoked"
 [ ! -e "$SENTINEL" ] || fail "literal metacharacter forwarding: shell syntax was executed"
-pass "forwards shell metacharacters as literal argv"

@@ -134,7 +134,7 @@ Find entity GUIDs (needed for API calls and deployment markers):
 # List all APM apps
 newrelic entity search --name "" --type APPLICATION --domain APM
 
-# Get specific entity details
+# Get APM application details
 newrelic apm application get --guid <GUID>
 
 # List all hosts
