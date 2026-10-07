@@ -13,14 +13,15 @@ metadata:
   openclaw:
     purpose: >
       New Relic observability skill for both read and targeted write workflows.
-      Reads APM metrics, NRQL query results, alert policies/conditions, incidents,
-      and infrastructure host data from the New Relic API. Write operations in this
-      repo include deployment marker creation plus alert policy, condition, and
-      notification channel creation; the alerts sub-skill also documents alert
-      condition deletion. IAM workflows add user/group CRUD, membership changes, and
-      access-grant creation/revocation; require explicit confirmation before IAM writes
-      and verify each write by reading the target back. Helper scripts execute newrelic
-      CLI commands only and should validate untrusted inputs before embedding them in NRQL.
+      Reads APM metrics, NRQL query results, AI Monitoring events (including potentially
+      sensitive prompt/response content and tool inputs), alert policies/conditions,
+      incidents, and infrastructure host data from the New Relic API. Write operations
+      in this repo include deployment marker creation plus alert policy, condition, and
+      notification channel creation; the alerts sub-skill also documents alert condition
+      deletion. IAM workflows add user/group CRUD, membership changes, and access-grant
+      creation/revocation; require explicit confirmation before IAM writes and verify each
+      write by reading the target back. Helper scripts execute newrelic CLI commands only
+      and should validate untrusted inputs before embedding them in NRQL.
     requires:
       env:
         - NEW_RELIC_API_KEY
@@ -120,7 +121,7 @@ newrelic apm deployment create \
 newrelic diagnose run
 
 # Find applications reporting AI Monitoring telemetry
-newrelic aimonitoring application search --tags aiEnabledApp:true
+newrelic aimonitoring application search
 ```
 
 ---

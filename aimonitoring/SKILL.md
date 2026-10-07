@@ -26,7 +26,8 @@ it in command output.
 
 ## Find AI-enabled Applications
 
-Start broad, then narrow by name, tags, or a shorter time window:
+Start broad. Use a name or shorter time window to reduce the discovery query, then
+optionally filter the resolved entities by tags:
 
 ```bash
 # Applications that reported AI Monitoring telemetry in the last seven days
@@ -47,9 +48,17 @@ The result contains only each matching application's `name` and `entityGuid`. `-
 filters the AI Monitoring events by `appName`; `--tags` filters the resolved New Relic
 entities, and multiple tags use AND semantics.
 
-Application discovery requests at most 500 unique entity GUIDs. If the CLI warns that
-results were truncated, shorten `--since` or add `--name` or `--tags`; do not treat the
+Application discovery requests at most 500 unique entity GUIDs from NRDB, but then passes
+the entire set to one unbatched entity lookup whose client API supports at most 25 GUIDs.
+A search that finds more than 25 GUIDs can therefore fail before printing results. If the
+CLI reports an entity lookup error or warns that the 500-GUID NRDB result was truncated,
+shorten `--since` or add `--name`; `--tags` is applied only after entity resolution and
+cannot reduce either limit or recover entities omitted by truncation. Do not treat a
 partial result as a complete inventory.
+
+Application discovery does not include `LlmVectorSearchResult` in its NRDB event set.
+The `events` command below can query that event type, but an application reporting only
+`LlmVectorSearchResult` will not be found by `application search`.
 
 ---
 
@@ -73,7 +82,7 @@ partial result as a complete inventory.
 ```bash
 newrelic aimonitoring events \
   --type summary \
-  --select "count(*), sum(response.usage.total_tokens), average(duration)" \
+  --select "count(*), sum(response.usage.total_tokens)" \
   --since "1 day ago"
 ```
 
@@ -84,8 +93,7 @@ newrelic aimonitoring events \
   --type summary \
   --select "count(*)" \
   --where "error is true" \
-  --since "1 day ago" \
-  --limit 100
+  --since "1 day ago"
 ```
 
 ### Message Content
@@ -109,14 +117,16 @@ and retention requirements.
 
 ## Query Construction Safety
 
-The CLI inserts `--select`, `--where`, and `--since` directly into the generated NRQL
-query. Treat these flags as executable query fragments:
+The `events` command inserts `--select`, `--where`, and `--since` directly into the
+generated NRQL query. `application search` also inserts `--since` directly. Treat these
+flags as executable query fragments:
 
 - Do not interpolate untrusted user or external-system text into them.
 - Prefer fixed, reviewed clauses and allowlisted field names.
 - Keep `--since` and `--limit` bounded before selecting high-cardinality or sensitive data.
-- Use `application search --name` for application-name discovery when possible; that
-  command escapes backslashes and single quotes before constructing its NRQL filter.
+- Use `application search --name` for application-name discovery when possible; only
+  that flag's value is escaped for backslashes and single quotes before the command
+  constructs its NRQL filter.
 - If a dynamic NRQL value is unavoidable, validate and escape it before invoking the CLI.
 
 ---
@@ -143,5 +153,10 @@ Select both trace fields when the query must correlate events from mixed instrum
   names are not accepted by `--type`.
 - **Unexpected duration values:** separate OpenTelemetry and APM-agent events before
   interpreting duration.
-- **Incomplete application inventory:** treat the 500-GUID warning as truncation and
-  narrow the search before making completeness claims.
+- **Application entity lookup fails:** the CLI sends all discovered GUIDs through one
+  entity lookup that supports at most 25 GUIDs, and it returns `NotFound` when none of the
+  GUIDs resolve (for example, after entities were deleted). Narrow with `--name` or a
+  shorter `--since`; `--tags` cannot prevent these failures because it is applied later.
+- **Incomplete application inventory:** treat the 500-GUID warning as truncation, narrow
+  with `--name` or a shorter `--since`, and do not rely on `--tags` to restore omitted
+  entities.
