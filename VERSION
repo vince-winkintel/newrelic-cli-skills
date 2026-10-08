@@ -1,8 +1,12 @@
-1.0.8
+1.0.9
 
 Release/version change metadata for this skill set lives here, not in individual skill files.
 
 Historical notes consolidated from skill docs:
+- Skill package v1.0.9
+  - Resolved the ClawHub audit findings after validating New Relic CLI v0.115.0: removed unsupported alert write guidance and limited the alert sub-skill to supported read-only NRQL and entity inspection.
+  - Replaced inline CI deployment-marker source with quoted calls to the maintained helper.
+  - Added strict numeric application-ID validation, normalized common multi-line whitespace, rejected remaining control characters, and added regression coverage proving unsafe inputs are rejected and shell metacharacters remain literal arguments.
 - newrelic-cli v0.114.4-v0.115.0
   - Reviewed upstream compare `v0.114.3...v0.115.0` on 2026-10-07; `v0.114.4` and `v0.114.5` contained no published user-facing changes relevant to this skill set.
   - Added current guidance for the new `aimonitoring application search` and `aimonitoring events` command trees introduced in v0.115.0, including event aliases, application-search limits, instrumentation-specific fields, NRQL-fragment handling, and sensitive prompt/response data safeguards.
