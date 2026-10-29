@@ -1,9 +1,9 @@
 ---
 name: newrelic-cli-skills
-version: 1.0.9
+version: 1.0.10
 description: >
   Monitor, query, and manage New Relic observability data via the newrelic CLI.
-  Covers NRQL queries, AI Monitoring telemetry, APM performance triage, deployment
+  Covers NRQL queries and organization-scoped macros, AI Monitoring telemetry, APM performance triage, deployment
   markers, read-only alert and incident inspection,
   infrastructure monitoring, agent diagnostics, and identity/access administration.
   Use when user asks about LLM token usage or AI application telemetry, application
@@ -17,7 +17,10 @@ metadata:
       sensitive prompt/response content and tool inputs), incidents, entity alert severity,
       and infrastructure host data from the New Relic API. The documented New Relic CLI
       has no alerts command tree, so alert and incident workflows in this repo are read-only.
-      Write operations include deployment marker creation. IAM workflows add user/group
+      Write operations include deployment marker creation and organization-scoped NRQL
+      macro creation/update/deletion. Require explicit approval before macro writes,
+      inspect downstream query/dashboard/alert impact, and read the exact target back.
+      IAM workflows add user/group
       CRUD, membership changes, and access-grant creation/revocation; require explicit
       confirmation before IAM writes and verify each
       write by reading the target back. Helper scripts execute newrelic CLI commands only
@@ -53,7 +56,7 @@ tags:
 ## Quick Decision Tree
 
 **Performance issue reported?** → [`apm/SKILL.md`](apm/SKILL.md)
-**Need to query data with NRQL?** → [`nrql/SKILL.md`](nrql/SKILL.md)
+**Need to query data or manage organization-scoped NRQL macros?** → [`nrql/SKILL.md`](nrql/SKILL.md)
 **AI/LLM application, token, error, prompt, or response telemetry?** → [`aimonitoring/SKILL.md`](aimonitoring/SKILL.md)
 **Recording a deployment?** → [`deployments/SKILL.md`](deployments/SKILL.md)
 **Inspecting alerts or incidents?** → [`alerts/SKILL.md`](alerts/SKILL.md)
@@ -158,7 +161,7 @@ newrelic entity search --name "" --type HOST
 | Sub-skill | When to use |
 |---|---|
 | [`apm/`](apm/SKILL.md) | Performance triage, slow transactions, error analysis |
-| [`nrql/`](nrql/SKILL.md) | Custom queries, dashboards, ad-hoc data exploration |
+| [`nrql/`](nrql/SKILL.md) | Custom queries, dashboards, ad-hoc exploration, and approval-gated organization macros |
 | [`aimonitoring/`](aimonitoring/SKILL.md) | AI/LLM applications, token usage, errors, prompts, responses, and telemetry |
 | [`deployments/`](deployments/SKILL.md) | Mark releases, correlate deploys with performance |
 | [`alerts/`](alerts/SKILL.md) | Read-only incident telemetry and entity alert severity |

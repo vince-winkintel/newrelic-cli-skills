@@ -1,8 +1,13 @@
-1.0.9
+1.0.10
 
 Release/version change metadata for this skill set lives here, not in individual skill files.
 
 Historical notes consolidated from skill docs:
+- Skill package v1.0.10 (pending Vince review)
+  - Evaluated newrelic-cli v0.115.3...v0.115.6: seven commits; v0.115.4/v0.115.5 are changelog/Scoop maintenance, and v0.115.6 adds NRQL Macro CRUD with newrelic-client-go v2.97.3.
+  - Added organization-scoped macro guidance for create/get/list/update/delete, immutable names, creation-only --org-id, optional/explicit-zero parameter counts, and literal shell quoting for $N expressions. Documented single-search inventory limits, output/log differences, explicit write approvals, downstream query/dashboard/alert impact, and exact-target read-back.
+  - Verified root, nrql, query, macros, and all five macro subcommand help surfaces with the official Darwin arm64 v0.115.6 binary after checking SHA-256 c01dae40068c9b001363c208b80a52b303591967ee691bb588d49295858a65db against the published checksum manifest. Nine complete raw captures and their manifest are external audit evidence; operational examples are authored, not claimed binary captures.
+  - Corrected adjacent NRQL output guidance to the verified JSON default. No helper/scheduler/workflow changes, live API calls, merge, release, or publication.
 - Skill package v1.0.9
   - Resolved the ClawHub audit findings after validating New Relic CLI v0.115.0: removed unsupported alert write guidance and limited the alert sub-skill to supported read-only NRQL and entity inspection.
   - Replaced inline CI deployment-marker source with quoted calls to the maintained helper.
