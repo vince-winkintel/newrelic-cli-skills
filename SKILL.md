@@ -19,7 +19,9 @@ metadata:
       has no alerts command tree, so alert and incident workflows in this repo are read-only.
       Write operations include deployment marker creation and organization-scoped NRQL
       macro creation/update/deletion. Require explicit approval before macro writes,
-      inspect downstream query/dashboard/alert impact, and read the exact target back.
+      inspect downstream query/dashboard impact with coverage gaps disclosed, and read
+      the exact target back. Macros are not supported in alert conditions; cached query
+      execution may lag behind stored-state read-back.
       IAM workflows add user/group
       CRUD, membership changes, and access-grant creation/revocation; require explicit
       confirmation before IAM writes and verify each
@@ -36,6 +38,10 @@ metadata:
         NEW_RELIC_ACCOUNT_ID is the numeric account ID from the NR UI.
         See README.md for CLI installation instructions.
         Use an API key scoped to the minimum required accounts.
+        Macro writes require Organization product admin or Organization manager access;
+        Organization read only grants macro reads. Confirm the effective organization
+        and its primary region before macro operations; environment credentials can
+        override the selected profile. See nrql/SKILL.md for preflight and write gates.
         IAM writes also require organization-level authorization for the user associated
         with the key: Authentication domain manager or Organization manager for
         usermanagement, and Organization manager for accessmanagement grant writes.
