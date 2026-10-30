@@ -79,8 +79,12 @@ single-quoted shell strings. Do not nest unescaped single quotes: the shell can
 silently remove the NRQL literal's quotes. Do not interpolate untrusted input.
 
 `$macroName` belongs in `--query`, not another macro's `--expression`. Single-quote
-the complete query or escape its dollar signs in double quotes. The nonparameterized
-query below demonstrates use; no unverified parameterized-call syntax is implied.
+the complete query only when it contains no embedded single quotes. When it has
+NRQL single-quoted string literals, use double shell quotes and escape each dollar
+sign, as in the mixed-literal query below (or correctly escape/concatenate the
+single-quoted shell strings). The same quote-loss warning applies to `--query` as
+to `--expression`. These nonparameterized queries demonstrate use; no unverified
+parameterized-call syntax is implied.
 The following are authored examples, not captured API responses or help output:
 
 ```bash
@@ -99,6 +103,10 @@ newrelic nrql macros get --id "$MACRO_ID" --format JSON
 # Read-only query after verifying filterProd exists; preserve the literal macro name
 newrelic nrql query --accountId "$NEW_RELIC_ACCOUNT_ID" \
   --query 'SELECT count(*) FROM Transaction WHERE $filterProd SINCE 1 hour ago'
+
+# With a NRQL string literal, preserve both its quotes and the literal macro name
+newrelic nrql query --accountId "$NEW_RELIC_ACCOUNT_ID" \
+  --query "SELECT count(*) FROM Transaction WHERE environment = 'production' AND \$filterProd SINCE 1 hour ago"
 
 # Only after separate approval: preserve literal parameter tokens and precedence
 newrelic nrql macros create \
