@@ -14,16 +14,26 @@ Checks: API key validity, account connectivity, agent config files, log paths, p
 
 ---
 
-## Validate Config File
+## Validate CLI Configuration and Connectivity
+
+This is a **live telemetry write**, not a local agent-configuration-file check.
+Obtain explicit approval before running it. Confirm the intended account, region,
+profile, and effective environment overrides without printing credentials; the
+tracer includes the machine hostname. The command validates the configured LICENSE
+ingest key, sends a tracer event, then queries New Relic to confirm receipt.
 
 ```bash
-# For .NET agent on Windows
-newrelic diagnose validate \
-  --config "C:\ProgramData\New Relic\.NET Agent\newrelic.config"
-
-# For Linux
-newrelic diagnose validate --config /etc/newrelic/newrelic.yml
+# Only after explicit approval for the verified target and hostname disclosure
+newrelic diagnose validate --profile "staging.us"
 ```
+
+There is no `diagnose validate --config` flag. Do not pass an agent YAML/XML file
+to this command or use it as an offline lint. A successful run confirms tracer
+ingestion, not that every application agent is healthy. Read
+[configuration-validation safeguards and compatibility](references/config-validation.md)
+before using this workflow, especially for accounts with many ingest keys. If it
+fails, report the failure; do not rotate keys, run installers, or bypass validation
+without separate authorization.
 
 ---
 
@@ -64,7 +74,10 @@ newrelic nrql query --accountId $NEW_RELIC_ACCOUNT_ID \
   --query "SELECT count(*) FROM NrIntegrationError SINCE 1 hour ago"
 ```
 
-If `NrIntegrationError` count > 0, data ingestion has issues.
+Inspect event details and purpose before diagnosing an ingestion issue. CLI
+configuration validation intentionally emits an `NrIntegrationError` tracer with
+purpose `New Relic CLI configuration validation`; a nonzero count alone is not
+proof of an application ingestion failure.
 
 ---
 

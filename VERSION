@@ -1,8 +1,13 @@
-1.0.10
+1.0.11
 
 Release/version change metadata for this skill set lives here, not in individual skill files.
 
 Historical notes consolidated from skill docs:
+- Skill package v1.0.11
+  - Evaluated newrelic-cli v0.115.7...v0.115.9. The latest release fixes license-key discovery/validation for accounts with more than 1,000 ingest keys and advances newrelic-client-go to v2.97.5. The intervening releases were documentation-neutral maintenance.
+  - Updated the affected diagnostics workflow: diagnose validate checks CLI profile/connectivity, validates the configured LICENSE ingest key, sends a tracer event, and polls NRQL; it is not local agent-file validation and has no --config flag. Require explicit authorization and target/hostname disclosure before sending telemetry. Kept installer execution outside this skill's workflows.
+  - Added a selectively installed reference with immutable upstream provenance, the actual compatibility minimum for paginated ingest-key validation, and the limits of automatic key-discovery validation skipping.
+  - Verified affected help with the official Darwin arm64 v0.115.9 binary against its published SHA-256 manifest. Complete captures and validation evidence remain outside the repository; authored examples are not claimed to be byte-exact captures. Runtime helpers and auth/security gates are unchanged.
 - Skill package v1.0.10
   - Evaluated newrelic-cli v0.115.3...v0.115.6: seven commits; v0.115.4/v0.115.5 are changelog/Scoop maintenance, and v0.115.6 adds NRQL Macro CRUD with newrelic-client-go v2.97.3.
   - Added organization-scoped macro guidance for create/get/list/update/delete, immutable names, creation-only --org-id, required counts for parameterized expressions and explicit-zero removal, and literal shell quoting for $N expressions and query macro references. Documented single-search inventory limits, output/log differences, effective-organization and primary-region preflight, macro roles, explicit write approvals, downstream query/dashboard impact with partial coverage disclosed, and exact-target read-back with zero-value JSON handling. Product documentation excludes alerts and warns of cached propagation; expression restrictions and precedence guidance are included.
