@@ -10,7 +10,7 @@ An [OpenClaw](https://openclaw.ai) agent skill for monitoring, querying, and man
 - **Deployment markers** — record releases so you can correlate deploys with performance changes
 - **Alert and incident inspection** — query incident telemetry and inspect entity alert severity without mutating alert configuration
 - **Infrastructure monitoring** — host CPU, memory, disk, and process metrics
-- **Agent diagnostics** — validate agent config and connectivity
+- **CLI and agent diagnostics** — check CLI profile/connectivity and agent reporting; live validation telemetry and nrdiag download/execution require explicit approval, with separate authorization for diagnostic-data uploads
 - **Identity and access management** — inspect and administer authentication domains, users, groups, memberships, roles, permissions, and access grants
 
 ## Requirements
@@ -70,7 +70,7 @@ newrelic profile default --profile default
 | `deployments/` | Deployment markers and release tracking |
 | `alerts/` | Read-only incident telemetry and entity alert severity |
 | `infrastructure/` | Host metrics — CPU, memory, disk, processes |
-| `diagnostics/` | Agent health, config validation, connectivity |
+| `diagnostics/` | CLI profile/connectivity validation, agent reporting, and approval-gated nrdiag suites |
 | `iam/` | Identity and access administration — users, groups, roles, permissions, grants |
 
 ## Scripts

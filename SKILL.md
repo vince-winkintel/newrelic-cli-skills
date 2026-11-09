@@ -22,6 +22,12 @@ metadata:
       inspect downstream query/dashboard impact with coverage gaps disclosed, and read
       the exact target back. Macros are not supported in alert conditions; cached query
       execution may lag behind stored-state read-back.
+      Diagnostics validate writes hostname-bearing NrIntegrationError tracer telemetry;
+      require explicit approval for the verified effective target and hostname disclosure,
+      and do not blindly retry interrupted writes. Diagnostics run can download and
+      execute nrdiag, including when listing suites; require explicit download/execution
+      approval and separate authorization for any diagnostic-data upload. The advertised
+      attachment-key flag is not forwarded by this CLI runner; do not assume upload.
       IAM workflows add user/group
       CRUD, membership changes, and access-grant creation/revocation; require explicit
       confirmation before IAM writes and verify each
@@ -126,8 +132,10 @@ newrelic apm deployment create \
   --revision "v1.2.3" \
   --description "Feature: user auth"
 
-# Run diagnostics
-newrelic diagnose run
+# Discover diagnostic CLI flags without launching nrdiag.
+# Before any diagnose run (even --list-suites), follow diagnostics/SKILL.md:
+# explicit download/execution approval; separate authorization for data upload.
+newrelic diagnose run --help
 
 # Find applications reporting AI Monitoring telemetry
 newrelic aimonitoring application search
@@ -172,7 +180,7 @@ newrelic entity search --name "" --type HOST
 | [`deployments/`](deployments/SKILL.md) | Mark releases, correlate deploys with performance |
 | [`alerts/`](alerts/SKILL.md) | Read-only incident telemetry and entity alert severity |
 | [`infrastructure/`](infrastructure/SKILL.md) | Host metrics, CPU/memory, process monitoring |
-| [`diagnostics/`](diagnostics/SKILL.md) | Agent health, config validation, connectivity |
+| [`diagnostics/`](diagnostics/SKILL.md) | CLI profile/connectivity validation, agent reporting, and approval-gated nrdiag suites |
 | [`iam/`](iam/SKILL.md) | Users, groups, memberships, roles, permissions, and access grants |
 
 ## Scripts

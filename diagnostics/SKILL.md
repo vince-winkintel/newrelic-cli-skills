@@ -1,16 +1,33 @@
-# Agent Diagnostics
+# CLI and Agent Diagnostics
 
-Validate New Relic agent configuration, connectivity, and reporting status.
+Check CLI configuration/connectivity and agent reporting; run the separate nrdiag
+troubleshooting suite only with explicit approval. `diagnose validate` does not
+validate agent configuration files.
 
 ---
 
-## Run Full Diagnostics
+## Run Approved, Targeted Diagnostics
+
+`diagnose run` downloads the platform-specific **nrdiag executable** into
+`~/.newrelic/bin` when absent, then executes it. This is not a read-only CLI/API
+preflight. Obtain explicit approval for download/execution and the intended
+diagnostic scope before any invocation, including `--list-suites`: listing also
+uses the executable and can trigger its download. Use `diagnose run --help` for
+CLI flag discovery without launching nrdiag.
 
 ```bash
-newrelic diagnose run
+# Only after explicit download/execution approval
+newrelic diagnose run --list-suites
+# After reviewing the list and approving these specific suites
+newrelic diagnose run --suites java,infra
 ```
 
-Checks: API key validity, account connectivity, agent config files, log paths, proxy settings.
+Checks depend on the selected nrdiag suites, not on a fixed set of CLI checks.
+Treat collected configuration, logs, and results as potentially sensitive. Never
+pass `--attachment-key` or upload results to a support ticket without separate
+authorization for the destination and reviewed data. The flag is advertised for
+upload, but this CLI's runner does not forward it to nrdiag; do not assume it
+uploads anything or work around that limitation with an unapproved upload.
 
 ---
 
@@ -23,9 +40,23 @@ tracer includes the machine hostname. The command validates the configured LICEN
 ingest key, sends a tracer event, then queries New Relic to confirm receipt.
 
 ```bash
-# Only after explicit approval for the verified target and hostname disclosure
-newrelic diagnose validate --profile "staging.us"
+# Stored-profile mode: verify this profile's account/region and required keys first.
+# Only after explicit approval for that target and hostname disclosure.
+# Remove overrides for this invocation only; do not alter the parent environment.
+env -u NEW_RELIC_API_KEY -u NEW_RELIC_ACCOUNT_ID \
+  -u NEW_RELIC_REGION -u NEW_RELIC_LICENSE_KEY \
+  newrelic diagnose validate --profile "staging.us"
 ```
+
+Use this example only with a complete, verified stored profile; stop if it lacks
+the intended API key, LICENSE ingest key, or account. A profile name alone does
+not establish its target. For environment-driven credentials instead, verify and
+approve the effective account/region and key pairing; `--profile` alone does not
+override them. Do not dump credentials during preflight. Allow a long-running
+tracked execution (for example, a 15-minute tool timeout, not a CLI flag); see the
+reference for retry timing. If interrupted, treat the write as uncertain and do
+not blindly re-run it; inspect the approved target read-only and obtain renewed
+approval before another invocation.
 
 There is no `diagnose validate --config` flag. Do not pass an agent YAML/XML file
 to this command or use it as an offline lint. A successful run confirms tracer
@@ -68,10 +99,14 @@ newrelic entity search --name "my-app" --type APPLICATION --domain APM | \
 ## Connectivity Test
 
 ```bash
-# Test API key and account access
+# Inventory stored profiles (not a connectivity test)
 newrelic profile list --format JSON
-newrelic nrql query --accountId $NEW_RELIC_ACCOUNT_ID \
-  --query "SELECT count(*) FROM NrIntegrationError SINCE 1 hour ago"
+# Query access and integration-error triage, excluding intentional CLI tracers
+newrelic nrql query --accountId "$NEW_RELIC_ACCOUNT_ID" \
+  --query "SELECT count(*) FROM NrIntegrationError WHERE purpose IS NULL OR purpose != 'New Relic CLI configuration validation' SINCE 1 hour ago"
+# Inspect details before assigning a cause; no FACET that could hide missing fields
+newrelic nrql query --accountId "$NEW_RELIC_ACCOUNT_ID" \
+  --query "SELECT category, message, newRelicFeature, purpose FROM NrIntegrationError WHERE purpose IS NULL OR purpose != 'New Relic CLI configuration validation' SINCE 1 hour ago LIMIT 20"
 ```
 
 Inspect event details and purpose before diagnosing an ingestion issue. CLI
@@ -87,7 +122,7 @@ proof of an application ingestion failure.
 |---|---|---|
 | App shows `reporting: false` | Agent stopped or config missing | Restart app pool / check agent logs |
 | Transaction count = 0 | IIS app pool recycled without agent init | Ensure agent auto-instruments on startup |
-| High `NrIntegrationError` | Data too large or malformed | Check agent logs for serialization errors |
+| High `NrIntegrationError` after excluding CLI validation tracers | Cause depends on event details; not necessarily malformed data | Exclude purpose `New Relic CLI configuration validation`, retain events with no purpose, and inspect `category`/`message` before selecting a fix |
 | `alertSeverity: NOT_CONFIGURED` | No alert conditions on the entity | Add NRQL or APM metric conditions |
 
 ---
