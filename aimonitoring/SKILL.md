@@ -1,9 +1,11 @@
 # AI Monitoring
 
 Use the New Relic CLI to find applications reporting AI/LLM telemetry and query the
-underlying AI Monitoring NRDB events.
+underlying AI Monitoring NRDB events, discover datasets, and list dataset versions.
 
-These commands are read-only, but their results can contain sensitive prompts,
+Discovery and event queries are read-only. Dataset/version deletion is irreversible
+and requires the explicit approval workflow in the [dataset reference](references/datasets.md).
+Read results can contain sensitive prompts,
 responses, tool inputs, or customer data. Query only the fields needed for the task,
 keep the time range narrow, and do not paste message content into tickets, chat, logs,
 or third-party systems without explicit authorization.
@@ -21,6 +23,24 @@ export NEW_RELIC_ACCOUNT_ID="1234567"
 
 Prefer an existing profile when one is configured. Never print the API key or include
 it in command output.
+
+---
+
+## Datasets and Versions
+
+Default to read-only discovery and inventory:
+
+```bash
+newrelic aimonitoring dataset search --name "evaluation" --format JSON
+newrelic aimonitoring dataset-version list --dataset-id "EXACT_DATASET_ID" --format JSON
+```
+
+Use the returned dataset `id`, not a name or version number. The
+[self-contained dataset reference](references/datasets.md) is required before any
+dataset deletion: it covers CLI >=v0.117.0, effective credential/region scope,
+local filters, pagination limits, output fields, fresh read-back, explicit approval,
+cascade/last-version effects, and post-action verification. An inventory request
+does not authorize deletion.
 
 ---
 
