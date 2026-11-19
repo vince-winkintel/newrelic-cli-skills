@@ -46,6 +46,8 @@ metadata:
       notes: |
         NEW_RELIC_API_KEY must be a User Key (starts with NRAK-).
         NEW_RELIC_ACCOUNT_ID is the numeric account ID from the NR UI.
+        AI Monitoring dataset and dataset-version commands require CLI >=v0.117.0;
+        check newrelic --version before using them. This floor applies only to those commands.
         See README.md for CLI installation instructions.
         Use an API key scoped to the minimum required accounts.
         Macro writes require Organization product admin or Organization manager access;
