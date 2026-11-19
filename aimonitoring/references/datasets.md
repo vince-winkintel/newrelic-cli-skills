@@ -45,7 +45,7 @@ nr_dataset() {
   esac
   env -u NEW_RELIC_API_KEY -u NEW_RELIC_ACCOUNT_ID \
     -u NEW_RELIC_REGION -u NEW_RELIC_LICENSE_KEY \
-    NEW_RELIC_REGION="$NR_DATASET_REGION" NEW_RELIC_CLI_LOG_LEVEL=error \
+    NEW_RELIC_REGION="$NR_DATASET_REGION" NEW_RELIC_CLI_LOG_LEVEL=info \
     newrelic --profile "$NR_DATASET_PROFILE" "$@"
 }
 # Authorized read only; no dataset mutation or telemetry write.
@@ -58,7 +58,9 @@ selects it explicitly, and the owner must confirm it is the intended region. Sto
 errors, missing identity fields, or a mismatch; a successful identity read does not
 prove dataset ownership or write permission. Use `nr_dataset` in place of `newrelic`
 in the examples below when using this mode. Recheck scope if credentials, profile,
-region, or operator change. Do not enable `--debug`, `--trace`, or shell tracing.
+region, or operator change. The wrapper explicitly selects `info`: cancellation and
+empty-result notices remain visible, while inherited debug/trace logging is suppressed.
+Do not enable `--debug`, `--trace`, or shell tracing.
 
 Dataset discovery uses actor-level entity management queries for accessible entities.
 It does not add an account predicate or pass an account ID to these dataset API calls.
@@ -152,8 +154,10 @@ in their own interactive terminal. Do not emulate that human confirmation.
    --id "EXACT_DATASET_ID"` or `newrelic aimonitoring dataset delete-version
    --id "EXACT_DATASET_ID" --version-id "EXACT_VERSION_ID"`. Keep interactive
    confirmation enabled. The prompt defaults to **No**; declining or interrupting
-   cancels without a mutation and logs `delete cancelled`. Other prompt errors fail
-   before mutation. `--yes`/`-y` skips the prompt; its presence in help or error text
+   cancels without a mutation and logs `delete cancelled`. A confirmed cancellation
+   ends this attempt without deletion; do not treat exit status 0 as deletion success
+   or proceed to deletion verification. Other prompt errors fail before mutation.
+   `--yes`/`-y` skips the prompt; its presence in help or error text
    is not approval. Do not use or recommend `--yes`/`-y`, or supply the answer by
    non-interactive means (pipes, `yes`, heredocs, redirected input, expect scripts,
    or automated PTY wrappers). If a human cannot answer interactively, stop and
