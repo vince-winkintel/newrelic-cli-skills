@@ -6,7 +6,7 @@ An [OpenClaw](https://openclaw.ai) agent skill for monitoring, querying, and man
 
 - **Performance triage** — identify slow transactions, DB bottlenecks, and error spikes
 - **NRQL queries and macros** — run ad-hoc queries and manage reusable organization-scoped expressions; macro writes require explicit approval and impact review
-- **AI Monitoring** — find AI-enabled applications and inspect LLM token, error, tool, embedding, and message telemetry
+- **AI Monitoring** — find AI-enabled applications and inspect LLM token, error, tool, embedding, and message telemetry; discover datasets and versions, with explicit approval required for irreversible deletion
 - **Deployment markers** — record releases so you can correlate deploys with performance changes
 - **Alert and incident inspection** — query incident telemetry and inspect entity alert severity without mutating alert configuration
 - **Infrastructure monitoring** — host CPU, memory, disk, and process metrics
@@ -18,6 +18,10 @@ An [OpenClaw](https://openclaw.ai) agent skill for monitoring, querying, and man
 - [`newrelic` CLI](https://github.com/newrelic/newrelic-cli) installed
 - `NEW_RELIC_API_KEY` — User key (starts with `NRAK-`)
 - `NEW_RELIC_ACCOUNT_ID` — Numeric account ID
+
+Dataset commands require CLI **>=v0.117.0**. See the self-contained
+[dataset reference](aimonitoring/references/datasets.md) for flags, scope, limits,
+and deletion safeguards. This feature minimum does not replace earlier workflow minima.
 
 ## Install CLI
 
@@ -66,7 +70,7 @@ newrelic profile default --profile default
 |---|---|
 | `apm/` | Performance triage — slow transactions, DB analysis, error rates |
 | `nrql/` | NRQL queries and organization-scoped macros (create/get/list/update/delete) |
-| `aimonitoring/` | AI/LLM application discovery, token usage, errors, prompts, responses, and telemetry |
+| `aimonitoring/` | AI/LLM telemetry, dataset discovery/version inventory, and approval-gated deletion |
 | `deployments/` | Deployment markers and release tracking |
 | `alerts/` | Read-only incident telemetry and entity alert severity |
 | `infrastructure/` | Host metrics — CPU, memory, disk, processes |
