@@ -1,6 +1,6 @@
 ---
 name: newrelic-cli-skills
-version: 1.0.12
+version: 1.0.13
 description: >
   Monitor, query, and manage New Relic observability data via the newrelic CLI.
   Covers NRQL queries and organization-scoped macros, AI Monitoring telemetry and datasets, APM performance triage, deployment
@@ -48,7 +48,7 @@ metadata:
         NEW_RELIC_ACCOUNT_ID is the numeric account ID from the NR UI.
         AI Monitoring dataset and dataset-version commands require CLI >=v0.117.0;
         check newrelic --version before using them. This floor applies only to those commands.
-        See README.md for CLI installation instructions.
+        See references/installation.md for CLI installation instructions.
         Use an API key scoped to the minimum required accounts.
         Macro writes require Organization product admin or Organization manager access;
         Organization read only grants macro reads. Confirm the effective organization
@@ -86,18 +86,18 @@ tags:
 
 ## Setup & Auth
 
+For installation, use Homebrew on macOS or an official release archive. The Scoop
+route remains blocked by manifest/archive checksum mismatches, including the checked
+default-branch manifest; do not skip or disable checksum checks. Follow the
+[installation reference](references/installation.md) for immutable evidence and the
+manual path: verify the exact archive against its release's official SHA-256 manifest
+(case-insensitive hex comparison) before extraction. This checks integrity, not
+release authenticity. Confirm the selected version with `newrelic --version` before
+configuring credentials.
+
 ```bash
-# Install (manual or package manager)
 # macOS (Homebrew)
 brew install newrelic-cli
-
-# Windows (Scoop)
-scoop bucket add newrelic-cli https://github.com/newrelic/newrelic-cli.git
-scoop install newrelic-cli
-
-# Or manually download a release archive from:
-# https://github.com/newrelic/newrelic-cli/releases
-# Extract it, place the `newrelic` binary on your PATH, then verify with:
 newrelic --version
 
 # Configure profile
@@ -200,5 +200,6 @@ newrelic entity search --name "" --type HOST
 
 ## References
 
+- [`references/installation.md`](references/installation.md) — CLI installation, checksum checks, and Scoop mismatch evidence
 - [`references/nrql-patterns.md`](references/nrql-patterns.md) — Common NRQL query patterns
 - [`references/performance-triage.md`](references/performance-triage.md) — Step-by-step triage guide
