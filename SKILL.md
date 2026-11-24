@@ -1,6 +1,6 @@
 ---
 name: newrelic-cli-skills
-version: 1.0.12
+version: 1.0.13
 description: >
   Monitor, query, and manage New Relic observability data via the newrelic CLI.
   Covers NRQL queries and organization-scoped macros, AI Monitoring telemetry and datasets, APM performance triage, deployment
@@ -86,18 +86,16 @@ tags:
 
 ## Setup & Auth
 
+For installation, use Homebrew on macOS or an official release archive. The reviewed
+Scoop route is blocked by a checksum mismatch; do not skip or disable checksum
+checks. Follow the [installation reference](references/installation.md) for the pinned
+finding and manual path: verify the exact archive against its release's official
+SHA-256 manifest before extraction, then confirm the selected version with
+`newrelic --version` before configuring credentials. See also [README.md](README.md).
+
 ```bash
-# Install (manual or package manager)
 # macOS (Homebrew)
 brew install newrelic-cli
-
-# Windows (Scoop)
-scoop bucket add newrelic-cli https://github.com/newrelic/newrelic-cli.git
-scoop install newrelic-cli
-
-# Or manually download a release archive from:
-# https://github.com/newrelic/newrelic-cli/releases
-# Extract it, place the `newrelic` binary on your PATH, then verify with:
 newrelic --version
 
 # Configure profile
