@@ -48,7 +48,7 @@ metadata:
         NEW_RELIC_ACCOUNT_ID is the numeric account ID from the NR UI.
         AI Monitoring dataset and dataset-version commands require CLI >=v0.117.0;
         check newrelic --version before using them. This floor applies only to those commands.
-        See README.md for CLI installation instructions.
+        See references/installation.md for CLI installation instructions.
         Use an API key scoped to the minimum required accounts.
         Macro writes require Organization product admin or Organization manager access;
         Organization read only grants macro reads. Confirm the effective organization
@@ -86,12 +86,14 @@ tags:
 
 ## Setup & Auth
 
-For installation, use Homebrew on macOS or an official release archive. The reviewed
-Scoop route is blocked by a checksum mismatch; do not skip or disable checksum
-checks. Follow the [installation reference](references/installation.md) for the pinned
-finding and manual path: verify the exact archive against its release's official
-SHA-256 manifest before extraction, then confirm the selected version with
-`newrelic --version` before configuring credentials. See also [README.md](README.md).
+For installation, use Homebrew on macOS or an official release archive. The Scoop
+route remains blocked by manifest/archive checksum mismatches, including the checked
+default-branch manifest; do not skip or disable checksum checks. Follow the
+[installation reference](references/installation.md) for immutable evidence and the
+manual path: verify the exact archive against its release's official SHA-256 manifest
+(case-insensitive hex comparison) before extraction. This checks integrity, not
+release authenticity. Confirm the selected version with `newrelic --version` before
+configuring credentials.
 
 ```bash
 # macOS (Homebrew)
@@ -198,5 +200,6 @@ newrelic entity search --name "" --type HOST
 
 ## References
 
+- [`references/installation.md`](references/installation.md) — CLI installation, checksum checks, and Scoop mismatch evidence
 - [`references/nrql-patterns.md`](references/nrql-patterns.md) — Common NRQL query patterns
 - [`references/performance-triage.md`](references/performance-triage.md) — Step-by-step triage guide

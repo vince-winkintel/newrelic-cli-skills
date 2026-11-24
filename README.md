@@ -33,12 +33,14 @@ Use Homebrew on macOS or a checksum-verified archive from the official New Relic
 brew install newrelic-cli
 ```
 
-### Option 2: Scoop (Windows) — blocked at reviewed revision
+### Option 2: Scoop (Windows) — blocked by archive checksum mismatch
 
-The official Scoop manifest at the reviewed v0.117.1 commit points to a v0.117.0
-Windows archive with a mismatched SHA-256. Treat this route as blocked; do not skip
-or disable checksum checks. See the [installation reference](references/installation.md)
-for immutable provenance and the exact mismatch. A later Scoop fix has not been verified.
+The official Scoop manifest hash does not match the published Windows archive in
+three checked releases, including the default-branch manifest reviewed on 2026-11-24.
+The mismatch persists after the manifest version bump; the tag's older manifest is
+not itself the defect. Treat this route as blocked; do not skip or disable checksum
+checks. See the [installation reference](references/installation.md) for immutable
+manifest revisions, archive hashes, and the evidence needed to re-evaluate this block.
 
 ### Option 3: Manual install from official releases
 
@@ -46,7 +48,10 @@ for immutable provenance and the exact mismatch. A later Scoop fix has not been 
 2. Download the archive for your OS/architecture and that same release's official checksum manifest.
 3. Compute the archive's SHA-256 and compare it with the manifest entry for the exact filename
    (for example, PowerShell `Get-FileHash -Algorithm SHA256 <archive>` or macOS `shasum -a 256 <archive>`).
-   Stop if the checksum is missing or differs; never bypass verification.
+   Compare hexadecimal hashes case-insensitively: PowerShell prints uppercase while
+   the release manifests use lowercase. Stop if the checksum is missing or differs;
+   never bypass verification. A match detects corruption and manifest drift, not
+   release authenticity: an attacker able to replace both files can preserve the match.
 4. Only after a match, extract it and move `newrelic` (Windows: `newrelic.exe`) into a directory on your `PATH`.
 5. Run `newrelic --version` and confirm it reports the release you selected before configuring credentials.
 
